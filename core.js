@@ -29,8 +29,13 @@ function tokenize(expression) {
       let j = i;
       while (j < expression.length && expression[j] >= "a" && expression[j] <= "z") j += 1;
       const word = expression.slice(i, j);
-      if (word !== "ans") throw new Error("無效算式:不認識「" + word + "」");
-      tokens.push({ type: "ans" });
+      if (word === "ans") {
+        tokens.push({ type: "ans" });
+      } else if (word === "sqrt") {
+        tokens.push({ type: "sqrt" });
+      } else {
+        throw new Error("無效算式:不認識「" + word + "」");
+      }
       i = j;
       continue;
     }
@@ -48,7 +53,7 @@ function tokenize(expression) {
 // term    := unary (('*'|'/') unary)*
 // unary   := '-' unary | postfix
 // postfix := primary ('%')*          — `%` 一律「除以 100」(docs/adr/0002)
-// primary := number | 'ans' | '(' expr ')'
+// primary := number | 'ans' | '(' expr ')' | 'sqrt' '(' expr ')'
 function evaluate(expression, ans) {
   const tokens = tokenize(expression);
   let pos = 0;
@@ -112,6 +117,16 @@ function evaluate(expression, ans) {
       if (peek() !== ")") throw new Error("無效算式:少了右括號");
       pos += 1;
       return value;
+    }
+    if (token.type === "sqrt") {
+      pos += 1;
+      if (peek() !== "(") throw new Error("無效算式:sqrt 後面需要「(」");
+      pos += 1;
+      const arg = expr();
+      if (peek() !== ")") throw new Error("無效算式:少了右括號");
+      pos += 1;
+      if (!(arg >= 0)) throw new Error("無效算式:sqrt 不能是負數");
+      return Math.sqrt(arg);
     }
     throw new Error("無效算式:這裡不能出現「" + token.type + "」");
   }

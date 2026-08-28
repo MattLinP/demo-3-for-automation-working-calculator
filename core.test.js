@@ -30,6 +30,18 @@ test("ans 代表上次結果", () => {
   assert.throws(() => evaluate("ans"), /目前沒有上次結果/);
 });
 
+test("sqrt(x) 平方根,參數是完整算式,可巢狀", () => {
+  assert.equal(evaluate("sqrt(9)"), 3);
+  assert.equal(evaluate("sqrt(1 + 3)"), 2);
+  assert.equal(evaluate("sqrt(sqrt(16))"), 2);
+});
+
+test("sqrt(x) 的無效輸入", () => {
+  assert.throws(() => evaluate("sqrt(-1)"), /無效算式/);
+  assert.throws(() => evaluate("sqrt(0 / 0)"), /無效算式/);
+  assert.throws(() => evaluate("foo(2)"), /不認識/);
+});
+
 test("無效算式要說得出原因", () => {
   assert.throws(() => evaluate(""), /空白/);
   assert.throws(() => evaluate("1 +"), /突然結束/);
