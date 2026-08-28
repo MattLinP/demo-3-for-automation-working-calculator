@@ -2,6 +2,28 @@
 // 傳統 script 形式:瀏覽器以 <script src> 載入,Node 以 require 載入。
 "use strict";
 
+function isDigit(ch) {
+  return ch >= "0" && ch <= "9";
+}
+
+// 數字之間允許用 `_` 分隔(如 1_000),規則比照 JS 數字字面量:
+// `_` 只能出現在兩個數字之間,否則視為不認識的字元(在呼叫端觸發「不認識」錯誤)。
+function consumeDigitRun(expression, start) {
+  let j = start;
+  while (j < expression.length) {
+    if (isDigit(expression[j])) {
+      j += 1;
+      continue;
+    }
+    if (expression[j] === "_" && isDigit(expression[j - 1]) && isDigit(expression[j + 1])) {
+      j += 1;
+      continue;
+    }
+    break;
+  }
+  return j;
+}
+
 function tokenize(expression) {
   const tokens = [];
   let i = 0;
@@ -11,17 +33,16 @@ function tokenize(expression) {
       i += 1;
       continue;
     }
-    if (ch >= "0" && ch <= "9") {
-      let j = i;
-      while (j < expression.length && expression[j] >= "0" && expression[j] <= "9") j += 1;
+    if (isDigit(ch)) {
+      let j = consumeDigitRun(expression, i);
       if (expression[j] === ".") {
         j += 1;
-        if (!(expression[j] >= "0" && expression[j] <= "9")) {
+        if (!isDigit(expression[j])) {
           throw new Error("無效算式:小數點後需要數字");
         }
-        while (j < expression.length && expression[j] >= "0" && expression[j] <= "9") j += 1;
+        j = consumeDigitRun(expression, j);
       }
-      tokens.push({ type: "number", value: Number(expression.slice(i, j)) });
+      tokens.push({ type: "number", value: Number(expression.slice(i, j).replace(/_/g, "")) });
       i = j;
       continue;
     }
