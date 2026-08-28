@@ -38,3 +38,16 @@ test("無效算式要說得出原因", () => {
   assert.throws(() => evaluate("abc"), /不認識/);
   assert.throws(() => evaluate("1 2"), /多出/);
 });
+
+test("數字可用 _ 分隔(僅限兩個數字之間)", () => {
+  assert.equal(evaluate("1_000 + 1"), 1001);
+  assert.equal(evaluate("1_000_000 / 4"), 250000);
+});
+
+test("_ 分隔錯誤位置要視為無效算式", () => {
+  assert.throws(() => evaluate("_100"), /不認識/);
+  assert.throws(() => evaluate("100_"), /不認識/);
+  assert.throws(() => evaluate("1__0"), /不認識/);
+  assert.throws(() => evaluate("1_.5"), /不認識/);
+  assert.throws(() => evaluate("1._5"), /小數點後需要數字/);
+});
