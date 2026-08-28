@@ -125,7 +125,7 @@ function evaluate(expression, ans) {
       const arg = expr();
       if (peek() !== ")") throw new Error("無效算式:少了右括號");
       pos += 1;
-      if (arg < 0) throw new Error("無效算式:sqrt 不能是負數");
+      if (!(arg >= 0)) throw new Error("無效算式:sqrt 不能是負數");
       return Math.sqrt(arg);
     }
     throw new Error("無效算式:這裡不能出現「" + token.type + "」");

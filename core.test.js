@@ -38,6 +38,7 @@ test("sqrt(x) 平方根,參數是完整算式,可巢狀", () => {
 
 test("sqrt(x) 的無效輸入", () => {
   assert.throws(() => evaluate("sqrt(-1)"), /無效算式/);
+  assert.throws(() => evaluate("sqrt(0 / 0)"), /無效算式/);
   assert.throws(() => evaluate("foo(2)"), /不認識/);
 });
 
